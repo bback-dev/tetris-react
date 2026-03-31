@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bomb">
+  <circle cx="32" cy="36" r="17" fill="#111827"/>
+  <circle cx="26" cy="30" r="4" fill="#475569"/>
+  <path d="M31 17c0-6 4-11 10-11" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="46" cy="7" r="4" fill="#f97316"/>
+</svg>

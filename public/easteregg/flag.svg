@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Flag">
+  <rect x="11" y="8" width="6" height="48" rx="2" fill="#cbd5e1"/>
+  <path d="M17 12h33l-8 10 8 10H17z" fill="#ef4444"/>
+  <rect x="6" y="54" width="22" height="6" rx="3" fill="#64748b"/>
+</svg>

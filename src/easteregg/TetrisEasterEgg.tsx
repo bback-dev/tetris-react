@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { getActiveEgg, setActiveEgg } from "./eggState";
 
 type Cell = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 type Board = Cell[][];
@@ -194,9 +195,11 @@ export default function TetrisEasterEgg() {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
 
       if (!open) {
+        if (getActiveEgg() !== null) return;
         konamiRef.current = [...konamiRef.current, key].slice(-TRIGGER.length);
         if (TRIGGER.every((k, i) => konamiRef.current[i] === k)) {
           setOpen(true);
+          setActiveEgg("tetris");
           reset();
         }
         return;
@@ -204,6 +207,7 @@ export default function TetrisEasterEgg() {
 
       if (e.key === "Escape") {
         setOpen(false);
+        setActiveEgg(null);
         return;
       }
       if (gameOver) return;
@@ -234,6 +238,12 @@ export default function TetrisEasterEgg() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, board, piece, gameOver]);
 
+  useEffect(() => {
+    return () => {
+      if (open) setActiveEgg(null);
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -244,6 +254,7 @@ export default function TetrisEasterEgg() {
           <button
             onClick={() => {
               setOpen(false);
+              setActiveEgg(null);
             }}
             style={btn}
           >
