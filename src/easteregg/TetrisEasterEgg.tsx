@@ -6,7 +6,9 @@ type PieceKey = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 
 const W = 10;
 const H = 20;
-const DROP_MS = 420;
+const BASE_DROP_MS = 380;
+const MIN_DROP_MS = 70;
+const LEVEL_SCORE_STEP = 400;
 const HIGH_SCORE_KEY = "easteregg_tetris_high_score";
 
 const SHAPES: Record<PieceKey, number[][]> = {
@@ -58,18 +60,7 @@ const COLORS = [
   "#f97316",
 ];
 
-const KONAMI = [
-  "ArrowUp",
-  "ArrowUp",
-  "ArrowDown",
-  "ArrowDown",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowLeft",
-  "ArrowRight",
-  "b",
-  "a",
-];
+const KONAMI = ["t", "e", "t", "r", "i", "s"];
 
 function createBoard(): Board {
   return Array.from({ length: H }, () => Array(W).fill(0 as Cell));
@@ -131,6 +122,7 @@ export default function TetrisEasterEgg() {
   const [piece, setPiece] = useState(randomPiece);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
   const [highScore, setHighScore] = useState<number>(() => {
     if (typeof window === "undefined") return 0;
     const raw = window.localStorage.getItem(HIGH_SCORE_KEY);
@@ -143,6 +135,9 @@ export default function TetrisEasterEgg() {
     if (!open) return board;
     return merge(board, piece.shape, piece.x, piece.y);
   }, [board, piece, open]);
+  const level = Math.floor(score / LEVEL_SCORE_STEP) + 1;
+  const dropMs = Math.max(MIN_DROP_MS, Math.floor(BASE_DROP_MS * Math.pow(0.88, level - 1)));
+  const prevLevelRef = useRef(level);
 
   const reset = () => {
     setBoard(createBoard());
@@ -151,8 +146,8 @@ export default function TetrisEasterEgg() {
     setGameOver(false);
   };
 
-  const lockAndSpawn = () => {
-    const merged = merge(board, piece.shape, piece.x, piece.y);
+  const lockAndSpawn = (locked = piece) => {
+    const merged = merge(board, locked.shape, locked.x, locked.y);
     const { board: cleaned, cleared } = clearLines(merged);
     setBoard(cleaned);
     if (cleared) setScore((s) => s + cleared * 100);
@@ -171,9 +166,22 @@ export default function TetrisEasterEgg() {
   };
 
   useEffect(() => {
-    const id = setInterval(tick, DROP_MS);
-    return () => clearInterval(id);
-  });
+    if (!open || gameOver) return;
+    const id = window.setTimeout(tick, dropMs);
+    return () => window.clearTimeout(id);
+  }, [open, gameOver, board, piece, dropMs]);
+
+  useEffect(() => {
+    if (!open) {
+      prevLevelRef.current = level;
+      return;
+    }
+    if (level <= prevLevelRef.current) return;
+    setLevelUpLevel(level);
+    prevLevelRef.current = level;
+    const id = window.setTimeout(() => setLevelUpLevel(null), 900);
+    return () => window.clearTimeout(id);
+  }, [level, open]);
 
   useEffect(() => {
     if (score <= highScore) return;
@@ -218,8 +226,7 @@ export default function TetrisEasterEgg() {
       if (e.key === " ") {
         let y = piece.y;
         while (!collides(board, piece.shape, piece.x, y + 1)) y++;
-        setPiece((p) => ({ ...p, y }));
-        setTimeout(lockAndSpawn, 0);
+        lockAndSpawn({ ...piece, y });
       }
     };
 
@@ -238,11 +245,15 @@ export default function TetrisEasterEgg() {
             Close (ESC)
           </button>
         </div>
-        <div style={{ marginBottom: 8 }}>Score: {score} · High Score: {highScore}</div>
-        <div style={grid}>
-          {rendered.flat().map((c, i) => (
-            <div key={i} style={{ ...cell, background: COLORS[c] }} />
-          ))}
+        <div style={metaRow}>Score: {score} · High Score: {highScore}</div>
+        <div style={boardWrap}>
+          <div style={levelBackdrop}>LV {level}</div>
+          <div style={grid}>
+            {rendered.flat().map((c, i) => (
+              <div key={i} style={{ ...cell, background: COLORS[c] }} />
+            ))}
+          </div>
+          {levelUpLevel !== null && <div style={levelUpBanner}>LEVEL UP · LV {levelUpLevel}</div>}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, opacity: 0.9 }}>
           Left/Right move, Up rotate, Down soft drop, Space hard drop
@@ -278,12 +289,54 @@ const panel: React.CSSProperties = {
   boxShadow: "0 12px 36px rgba(0,0,0,0.4)",
 };
 
+const metaRow: React.CSSProperties = {
+  marginBottom: 8,
+  fontSize: 13,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+const boardWrap: React.CSSProperties = {
+  position: "relative",
+};
+
+const levelBackdrop: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  display: "grid",
+  placeItems: "center",
+  fontSize: 46,
+  fontWeight: 800,
+  letterSpacing: 2,
+  color: "rgba(148,163,184,0.18)",
+  pointerEvents: "none",
+  userSelect: "none",
+};
+
 const grid: React.CSSProperties = {
+  position: "relative",
   display: "grid",
   gridTemplateColumns: `repeat(${W}, 1fr)`,
   gap: 1,
   background: "#0b1220",
   padding: 2,
+};
+
+const levelUpBanner: React.CSSProperties = {
+  position: "absolute",
+  top: 8,
+  left: "50%",
+  transform: "translateX(-50%)",
+  background: "rgba(14, 116, 144, 0.88)",
+  border: "1px solid rgba(103,232,249,0.65)",
+  color: "#ecfeff",
+  borderRadius: 999,
+  padding: "4px 10px",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: 0.4,
+  pointerEvents: "none",
 };
 
 const cell: React.CSSProperties = {

@@ -13,7 +13,7 @@ Then open the local Vite URL (usually `http://localhost:5173`).
 
 ## What this includes
 
-- Konami code trigger: `↑ ↑ ↓ ↓ ← → ← → B A`
+- Easy trigger: type `T E T R I S`
 - Keyboard controls for basic gameplay
 - Local high score persistence via `localStorage`
 - Single self-contained component (no external game library)
