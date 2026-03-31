@@ -60,7 +60,7 @@ const COLORS = [
   "#f97316",
 ];
 
-const KONAMI = ["t", "e", "t", "r", "i", "s"];
+const TRIGGER = ["t", "e", "t", "r", "i", "s"];
 
 function createBoard(): Board {
   return Array.from({ length: H }, () => Array(W).fill(0 as Cell));
@@ -194,8 +194,8 @@ export default function TetrisEasterEgg() {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
 
       if (!open) {
-        konamiRef.current = [...konamiRef.current, key].slice(-KONAMI.length);
-        if (KONAMI.every((k, i) => konamiRef.current[i] === k)) {
+        konamiRef.current = [...konamiRef.current, key].slice(-TRIGGER.length);
+        if (TRIGGER.every((k, i) => konamiRef.current[i] === k)) {
           setOpen(true);
           reset();
         }
@@ -241,7 +241,12 @@ export default function TetrisEasterEgg() {
       <div style={panel}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <strong>TETRIS EASTER EGG</strong>
-          <button onClick={() => setOpen(false)} style={btn}>
+          <button
+            onClick={() => {
+              setOpen(false);
+            }}
+            style={btn}
+          >
             Close (ESC)
           </button>
         </div>

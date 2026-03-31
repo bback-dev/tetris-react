@@ -16,12 +16,12 @@ Then open the local Vite URL (usually `http://localhost:5173`).
 - Easy trigger: type `T E T R I S`
 - Keyboard controls for basic gameplay
 - Local high score persistence via `localStorage`
-- Single self-contained component (no external game library)
+- Single self-contained Tetris easter egg component
 
 ## Install in your existing project
 
 1. Copy `src/easteregg/TetrisEasterEgg.tsx` into your React app.
-2. Mount it once near your root layout (for example in `src/App.tsx`).
+2. Mount the overlay once near your root layout (for example in `src/App.tsx`).
 
 ```tsx
 import TetrisEasterEgg from "./easteregg/TetrisEasterEgg";
@@ -39,6 +39,8 @@ export default App;
 ```
 
 ## Controls
+
+### Tetris
 
 - `Left / Right`: move
 - `Up`: rotate
