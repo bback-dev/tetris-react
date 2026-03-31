@@ -2,6 +2,15 @@
 
 Lightweight overlay Tetris component for existing React projects.
 
+## Run locally (demo)
+
+```bash
+npm install
+npm run dev
+```
+
+Then open the local Vite URL (usually `http://localhost:5173`).
+
 ## What this includes
 
 - Konami code trigger: `↑ ↑ ↓ ↓ ← → ← → B A`
